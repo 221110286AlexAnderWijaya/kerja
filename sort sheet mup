@@ -1,0 +1,41 @@
+Sub SortSheetsByMUP()
+    Dim ws As Worksheet
+    Dim cellValue As String
+    Dim i As Integer
+    Dim j As Integer
+    
+    ' Inisialisasi variabel
+    Application.ScreenUpdating = False
+    Application.DisplayAlerts = False
+
+    ' Mengurutkan lembar kerja berdasarkan nilai sel yang mengandung MUP
+    For i = 1 To ThisWorkbook.Sheets.Count - 1
+        For j = i + 1 To ThisWorkbook.Sheets.Count
+            If GetMUP(ThisWorkbook.Sheets(j).Range("A2").Value) < GetMUP(ThisWorkbook.Sheets(i).Range("A2").Value) Then
+                ThisWorkbook.Sheets(j).Move Before:=ThisWorkbook.Sheets(i)
+            End If
+        Next j
+    Next i
+
+    ' Mengembalikan pengaturan awal
+    Application.ScreenUpdating = True
+    Application.DisplayAlerts = True
+End Sub
+
+Function GetMUP(cellValue As String) As String
+    Dim mupValue As String
+    Dim mupMatch As Object
+    
+    Set mupMatch = CreateObject("VBScript.RegExp")
+    With mupMatch
+        .Global = True
+        .IgnoreCase = True
+        .Pattern = "MUP\s*:\s*(\S+)"
+    End With
+    
+    If mupMatch.Test(cellValue) Then
+        GetMUP = mupMatch.Execute(cellValue)(0).Submatches(0)
+    Else
+        GetMUP = ""
+    End If
+End Function
